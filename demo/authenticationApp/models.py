@@ -3,6 +3,8 @@ from django.db import models
 
 
 class CustomUser(AbstractUser):
+    is_suspended = models.BooleanField(default=False)
+    suspension_end_date = models.DateTimeField(null=True, blank=True)
     mobile_number = models.CharField(blank=True, null=True)
     groups = models.ManyToManyField(
         "auth.Group",
@@ -32,7 +34,11 @@ class CustomUser(AbstractUser):
 class PendingUser(models.Model):
     email = models.EmailField(unique=True)
     username = models.CharField(max_length=150, unique=True)
-    password = models.CharField(max_length=128)  # Store hashed password
+    password = models.CharField(max_length=128)
+    first_name = models.CharField(max_length=30, blank=True)
+    last_name = models.CharField(max_length=30, blank=True)
+    mobile_number = models.CharField(max_length=15, blank=True)
+    # Store hashed password
     is_approved = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 

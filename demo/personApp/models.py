@@ -23,6 +23,7 @@ class Personal_Details(models.Model):
         ('Pending', 'Pending'),
         ('Ongoing', 'Ongoing'),
         ('Solved', 'Solved'),
+        ('Closed', 'Closed'),
     ]
 
     levels = [
@@ -39,7 +40,8 @@ class Personal_Details(models.Model):
         ('Divorced', 'Divorced')
     ]
 
-    # user = models.ForeignKey(User, on_delete=models.CASCADE)
+    # this user is like we can only see data of one signed user
+    # user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=None)
     person_name = models.CharField(max_length=100, db_index=True)
     nick_name = models.CharField(max_length=50, db_index=True)
 
@@ -86,6 +88,7 @@ class Personal_Details(models.Model):
     level = models.CharField(choices=levels,max_length=10, db_index=True, null=True, blank=True)
     main_photo = models.ImageField(upload_to='person_photos/')
     case_status = models.CharField(choices=status, max_length=10, db_index=True, blank=True, null=True,default='Pending')
+    is_deleted = models.BooleanField(default=False)
 
     class Meta:
         indexes = [
@@ -119,3 +122,78 @@ class Multiple_Photos(models.Model):
     def __str__(self):
         return f'Photos of {self.person_name}'
 
+class Police_Station_Location(models.Model):
+    police_station_name = models.CharField(max_length=100, db_index=True)
+
+
+
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, db_index=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, db_index=True)
+
+    address = models.TextField(db_index=True)
+    pin_code = models.CharField(max_length=10, db_index=True)
+
+    village = models.CharField(max_length=100, db_index=True)
+    city = models.CharField(max_length=100, db_index=True)
+    taluka = models.CharField(max_length=100, db_index=True)
+    district = models.CharField(max_length=100, db_index=True)
+
+    state = models.CharField(max_length=100, db_index=True)
+    country = models.CharField(max_length=100, db_index=True)
+    police_station_photo = models.ImageField(null=True, blank=True, upload_to='policeStations/')
+    phone_number = models.CharField(max_length=15, db_index=True, null=True, blank=True)
+    email = models.EmailField(max_length=254, db_index=True, null=True, blank=True)
+    website = models.URLField(max_length=200, db_index=True, null=True, blank=True)
+    is_deleted = models.BooleanField(default=False)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['police_station_name','police_station_photo']),
+            models.Index(fields=['latitude', 'longitude']),
+            models.Index(fields=['address', 'pin_code']),
+            models.Index(fields=['village', 'city', 'taluka', 'district']),
+            models.Index(fields=['state', 'country']),
+            models.Index(fields=['phone_number', 'email', 'website']),
+        ]
+
+    def __str__(self):
+        return self.police_station_name
+
+class Police_Complaint_Details(models.Model):
+    person_name = models.ForeignKey(Personal_Details, on_delete=models.CASCADE, db_index=True)
+    fir_number = models.CharField(max_length=50, db_index=True)
+    is_deleted = models.BooleanField(default=False)
+    police_station_name = models.ForeignKey(Police_Station_Location, on_delete=models.CASCADE, db_index=True)
+    associate_police_officer_name = models.CharField(max_length=100, db_index=True)
+    designation = models.CharField(max_length=50, db_index=True)
+    fir_upload = models.FileField(upload_to='FIRs/', db_index=True, blank=True , null=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['person_name', 'fir_number']),
+            models.Index(fields=['police_station_name', 'associate_police_officer_name', 'designation']),
+            models.Index(fields=['fir_upload']),
+        ]
+
+    def __str__(self):
+        return f'Police complaint details of {self.person_name}'
+
+class Missing_Event_Details(models.Model):
+    person_name = models.ForeignKey(Personal_Details, on_delete=models.CASCADE, db_index=True)
+
+    missing_date = models.DateField(db_index=True)
+    missing_time = models.TimeField(db_index=True)
+
+    location_of_missing = models.TextField(db_index=True)
+    last_seen_location = models.TextField(db_index=True)
+    is_deleted = models.BooleanField(default=False)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['person_name']),
+            models.Index(fields=['missing_date', 'missing_time']),
+            models.Index(fields=['location_of_missing', 'last_seen_location']),
+        ]
+
+    def __str__(self):
+        return f'Missing details of {self.person_name}'

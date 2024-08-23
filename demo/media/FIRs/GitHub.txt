@@ -1,0 +1,72 @@
+GitHub commands to upload project in the online
+
+To get repo from the remote to the local machine use the following cmd
+	-first copy the repo link from GitHub account
+		git clone "link"
+
+To display the status of the repo use the following cmd
+	git status
+
+if we did some changes in code then we need to commit to then use following cmd
+	-first, we need to add using the following cmd
+		git add. (to add all files)
+		git add filename (to add specific files)
+			
+	-to commit everything use the following cmd
+		git commit -m "message"
+
+push command is used to upload local repo content to the remote repo
+	use the following cmd to push our repo local to the remote
+		git push origin main
+
+
+git init -  used to make github repo
+git add . - used to add 
+git commit -m  - used to commit 
+
+to upload local folder to github use following steps
+	- create new repo on github
+	-copy the url of repo
+	-git remote add origin "link"
+	-git init 
+	-git branch 
+	-git branch -m "new branch"
+	-git push -u origin main
+
+
+branch commands
+	git branch
+	-git branch -M main - 
+	- git chechout -b 'new branch' -create branch
+	- git branch -d branch name  -delete
+
+merging code 
+-git diff branch name
+-git merge branch name
+
+
+pull is used to merge to branches 
+	like main or sub branch
+	git pull origin main
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

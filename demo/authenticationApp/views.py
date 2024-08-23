@@ -8,7 +8,10 @@ from rest_framework.response import Response
 from django.contrib.auth import authenticate, login, get_user_model
 from rest_framework.views import APIView
 from django.contrib.auth.models import User
-
+from django.core.mail import send_mail
+from django.conf import settings
+from django.utils import timezone
+from datetime import timedelta
 from .models import PendingUser
 from .serializers import *
 from rest_framework.authtoken.models import Token
@@ -36,31 +39,25 @@ class AuthViews(APIView):
         else:
             return Response({'error': 'Invalid action'}, status=status.HTTP_400_BAD_REQUEST)
 
-
-    # def signup(self, request):
-    #     try:
-    #         serializer = SignUpSerializer(data=request.data)
-    #         if serializer.is_valid():
-    #             serializer.save()
-    #             return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
-    #         else:
-    #             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    #     except Exception as e:
-    #         logger.error(f"Error during signup: {e}", exc_info=True)
-    #         return Response({'message': 'Something went wrong'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
     def signup(self, request):
         try:
             serializer = SignUpSerializer(data=request.data)
             if serializer.is_valid():
-                # Save to PendingUser instead of creating a new user
                 data = serializer.validated_data
                 pending_user = PendingUser(
                     email=data['email'],
                     username=data['username'],
-                    password=data['password']  # Ensure to hash this before saving
+                    password=data['password'],
+                    first_name=data.get('first_name', ''),
+                    last_name=data.get('last_name', ''),
+                    mobile_number=data.get('mobile_number', '')
+
                 )
                 pending_user.save()
+                subject = 'Signup Request Received'
+                message = 'Thank you for signing up! Please wait for admin approval before you can log in.'
+                recipient_list = [pending_user.email]
+                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list)
                 return Response({'message': 'Signup request submitted. Await approval.'},
                                 status=status.HTTP_201_CREATED)
             else:
@@ -69,25 +66,8 @@ class AuthViews(APIView):
             logger.error(f"Error during signup: {e}", exc_info=True)
             return Response({'message': 'Something went wrong'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    # def login(self, request):
-    #     try:
-    #         if request.method == 'POST':
-    #             serializer = UserLoginSerializer(data=request.data)
-    #             if serializer.is_valid():
-    #                 username = serializer.validated_data['username']
-    #                 password = serializer.validated_data['password']
-    #                 user = authenticate(request, username=username, password=password)
-    #                 if user is not None:
-    #                     login(request, user)
-    #                     token, created = Token.objects.get_or_create(user=user)
-    #                     return Response({'message': 'Login successful', 'username': user.username, 'token': token.key},
-    #                                     status=200)
-    #                 else:
-    #                     return Response({'message': 'Invalid credentials'}, status=401)
-    #             else:
-    #                 return Response(serializer.errors, status=400)
-    #     except Exception as e:
-    #         return Response({'message': 'Something went wrong', 'error': str(e)}, status=500)
+
+
 
     def login(self, request):
         try:
@@ -98,6 +78,11 @@ class AuthViews(APIView):
                     password = serializer.validated_data['password']
                     try:
                         user = User.objects.get(email=email)
+                        if user.is_suspended:
+                            if user.suspension_end_date and user.suspension_end_date > timezone.now():
+                                return Response({'message': 'Your account is suspended. Please contact Admin.'},
+                                                status=403)
+
                         user = authenticate(request, username=user.username, password=password)
                     except User.DoesNotExist:
                         user = None

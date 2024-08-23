@@ -5,8 +5,6 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 class SignUpSerializer(serializers.ModelSerializer):
-    # Set fields as required for signup
-
     first_name = serializers.CharField(required=True)
     last_name = serializers.CharField(required=True)
     username = serializers.CharField(required=True)

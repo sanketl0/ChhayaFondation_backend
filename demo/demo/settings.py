@@ -1,7 +1,7 @@
 
 
 from pathlib import Path
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -116,7 +116,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
@@ -139,7 +141,7 @@ AUTH_USER_MODEL = 'authenticationApp.CustomUser'
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:4200',  # Angular development server
     'http://192.168.1.103:4200',  # Replace with your Angular frontend IP address if needed
-    'http://192.168.1.107:8000',  # Add the backend URL if your frontend is on a different IP
+
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
@@ -153,6 +155,41 @@ CORS_ALLOW_METHODS = [
     'OPTIONS',  # Include OPTIONS method if needed
 ]
 
-import os
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'sanketlodheofficial@gmail.com'
+EMAIL_HOST_PASSWORD = 'yvun jgkh lueq fodt'
+DEFAULT_FROM_EMAIL = 'sanketlodheofficial@gmail.com'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -21,6 +21,6 @@ urlpatterns = [
     path('complaintCount/' , complaintsCount.as_view(), name='complaint_count'),
     path('MissingEventDetail/',MissingEventDetailAPIView.as_view(), name='missing_event'),
     path('MissingEventDetail/<int:pk>/', MissingEventDetailAPIView.as_view(), name='complaint_detail_api'),
-    path('MissingEventDetail/<int:pk>/', MissingEventDetailAPIView.as_view(), name='complaint_detail_api'),
+    
 ]
 

@@ -50,7 +50,14 @@ class PoliceComplaintSerializer(serializers.ModelSerializer):
         return Police_Complaint_Details.objects.create(**validated_data)
 
 class MissingEventDetailsSerializer(serializers.ModelSerializer):
+    person_name_id = serializers.PrimaryKeyRelatedField(queryset=Personal_Details.objects.all(), source='person_name')
+    person_name = serializers.CharField(source='person_name.person_name', read_only=True)
+    missing_time_formatted = serializers.SerializerMethodField()
     class Meta:
         model = Missing_Event_Details
         fields = '__all__'
 
+    def get_missing_time_formatted(self, obj):
+        if obj.missing_time:
+            return obj.missing_time.strftime('%I:%M %p')
+        return None

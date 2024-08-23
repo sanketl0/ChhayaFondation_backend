@@ -180,10 +180,8 @@ class Police_Complaint_Details(models.Model):
 
 class Missing_Event_Details(models.Model):
     person_name = models.ForeignKey(Personal_Details, on_delete=models.CASCADE, db_index=True)
-
     missing_date = models.DateField(db_index=True)
     missing_time = models.TimeField(db_index=True)
-
     location_of_missing = models.TextField(db_index=True)
     last_seen_location = models.TextField(db_index=True)
     is_deleted = models.BooleanField(default=False)
@@ -196,4 +194,4 @@ class Missing_Event_Details(models.Model):
         ]
 
     def __str__(self):
-        return f'Missing details of {self.person_name}'
+        return f'Missing details of {self.person_name.person_name}'

@@ -448,10 +448,14 @@ class PoliceComplaintDetailAPIView(APIView):
         complaint.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
+
+# to apis for Get , Post , Put , Delete to add missing details of particular person
 class MissingEventDetailAPIView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
+    # this get permission is to implemented for to access data without authentication
     def get_permissions(self):
         if self.request.method == 'GET':
             return [AllowAny()]
@@ -491,13 +495,16 @@ class MissingEventDetailAPIView(APIView):
     def post(self, request):
         serializer = MissingEventDetailsSerializer(data=request.data)
         try:
+            person_name_id = request.data.get('person_name_id')
+            if Missing_Event_Details.objects.filter(person_name_id=person_name_id).exists():
+                return Response({'error': 'Missing event for this person already exists'},
+                                status=status.HTTP_400_BAD_REQUEST)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
     def put(self, request, pk):
         try:
             missing_event = Missing_Event_Details.objects.filter(pk=pk, is_deleted=False).first()
